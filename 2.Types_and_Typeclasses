@@ -1,0 +1,112 @@
+Haskell has type inference.
+
+<pre>
+Prelude> :t 'a'
+'a' :: Char
+Prelude> :t True
+True :: Bool
+Prelude> :t "Hello"
+"Hello" :: [Char]
+Prelude> :t (True, 'a')
+(True, 'a') :: (Bool, Char)
+Prelude> :t 4 == 5
+4 == 5 :: Bool
+</pre>
+
+<pre>
+Prelude> removeNonUppercase st = [ c | c <- st, c `elem` ['A'..'Z'] ]
+Prelude> :t removeNonUppercase
+removeNonUppercase :: [Char] -> [Char]
+Prelude> addThree x y z = x + y + z
+Prelude> :t addThree
+addThree :: Num a => a -> a -> a -> a
+</pre>
+
+Int: stands for integer
+Integer: it's not bounded
+Float, Double, Bool, Char, ()...
+
+Type variable
+<pre>
+Prelude> :t head
+head :: [a] -> a
+</pre>
+'a' can be of any type(much like generics)
+
+Typeclasses 101
+A typeclass is a sort of interface that defines some behavior.
+Everything before the '=>' symbol is called a class constraint.
+<pre>
+Prelude> :t (==)
+(==) :: Eq a => a -> a -> Bool
+</pre>
+The equality function takes any two values that are of the same type and returns a Bool.
+
+Eq: is used for type that support equality testing
+The functions its members implement are '==' and '/='.
+<pre>
+Prelude> 5 == 5
+True
+Prelude> 5 /= 5
+False
+</pre>
+
+Ord: is for types that have an ordering.
+It covers all the standard comparing function such as >,<,<= and <=.
+<pre>
+Prelude> :t (>)
+(>) :: Ord a => a -> a -> Bool
+</pre>
+
+Ordering: is a type that can be 'GT', 'LT' or 'EQ'.
+<pre>
+Prelude> "qwer" `compare` "asdf"
+GT
+Prelude> 3 `compare` 5
+LT
+</pre>
+
+Show: Members of Show can be presented as strings.
+<pre>
+Prelude> :t show
+show :: Show a => a -> String
+Prelude> show 3
+"3"
+</pre>
+
+Read: is sort of the opposite typeclass of 'Show'
+<pre>
+Prelude> :t read
+read :: Read a => String -> a
+Prelude> read "5" - 2
+3
+</pre>
+
+Enum: members are sequentially ordered types - they can be enumerated.
+<pre>
+Prelude> :t succ
+succ :: Enum a => a -> a
+Prelude> succ 'B'
+'C'
+Prelude> pred 'B'
+'A'
+</pre>
+
+Bounded: members have an upper and a lower bound.
+<pre>
+Prelude> :t maxBound
+maxBound :: Bounded a => a
+Prelude> maxBound :: Int
+9223372036854775807
+</pre> 
+
+Num: is a numeric typeclass.
+<pre>
+Prelude> :t 20
+20 :: Num p => p
+</pre>
+
+Integral: is also a numeric typeclass.
+Num includes all numbers, including real numbers and integral numbers, Integral includes only integral (whole) numbers.
+
+Floating: includes only floating point numbers.

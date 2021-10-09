@@ -1,0 +1,191 @@
+List
+
+<pre>
+Prelude> let lostNumbers = [4,8,15,16,23,42]
+Prelude> lostNumbers
+[4,8,15,16,23,42]
+</pre>
+
+++, :
+<pre>
+Prelude> [1,2] ++ [3,4]
+[1,2,3,4]
+Prelude> "he" ++ "llo" 
+"hello"
+Prelude> ['h','e'] ++ ['l', 'l', 'o']
+"hello"
+Prelude> 'h':"ello"
+"hello"
+Prelude> 1:[2,3]
+[1,2,3]
+</pre>
+
+!!
+<pre>
+Prelude> "Hello" !! 1
+'e'
+</pre>
+
+>, <, ==
+<pre>
+Prelude> [3,2] > [3,1]
+True
+Prelude> [3, 2] > [2, 2]
+True
+Prelude> [3,2] > [3,3]
+False
+Prelude> [3,2,1] > [3,3]
+False
+</pre>
+
+head, tail, last, init
+<pre>
+Prelude> head [3,2,1]
+3
+Prelude> tail [3,2,1]
+[2,1]
+Prelude> last [3,2,1]
+1
+Prelude> init [3,2,1]
+[3,2]
+</pre>
+
+length, null, reverse, take, drop, maximum, minimum, sum, product, elem
+<pre>
+Prelude> length [3, 2, 1]
+3
+Prelude> null [1]
+False
+Prelude> null []
+True
+Prelude> reverse [3,2,1]
+[1,2,3]
+Prelude> take 2 [2,3,1]
+[2,3]
+Prelude> take 4 [2,3,1]
+[2,3,1]
+Prelude> take 0 [2,3,1]
+[]
+Prelude> drop 2 [1,3,2,4]
+[2,4]
+Prelude> drop 0 [1,3,2,4]
+[1,3,2,4]
+Prelude> drop 5 [1,3,2,4]
+[]
+Prelude> maximum [3,1,2]
+3
+Prelude> minimum [3,1,2]
+1
+Prelude> sum [1,3,2]
+6
+Prelude> product [2,3]
+6
+Prelude> 2 `elem` [2,3,1]
+True
+Prelude> 4 `elem` [2,3,1]
+False
+</pre>
+
+Texas Ranges
+<pre>
+Prelude> [1..10]
+[1,2,3,4,5,6,7,8,9,10]
+Prelude> ['a'..'d']
+"abcd"
+Prelude> ['B'..'E']
+"BCDE"
+</pre>
+
+specify a step
+<pre>
+Prelude> [2,4..10]
+[2,4,6,8,10]
+</pre>
+
+reverse
+<pre>
+Prelude> [10..1]
+[]
+Prelude> [10,9..1]
+[10,9,8,7,6,5,4,3,2,1]
+</pre>
+
+inifinite
+<pre>
+Prelude> take 10 [1..]
+[1,2,3,4,5,6,7,8,9,10]
+</pre>
+
+cycle
+<pre>
+Prelude> take 10 (cycle [1,2,3])
+[1,2,3,1,2,3,1,2,3,1]
+Prelude> take 10 (cycle ["LOL "])
+["LOL ","LOL ","LOL ","LOL ","LOL ","LOL ","LOL ","LOL ","LOL ","LOL "]
+</pre>
+
+repeat
+<pre>
+Prelude> take 10 (repeat 5)
+[5,5,5,5,5,5,5,5,5,5]
+</pre>
+
+comprehension
+<pre>
+Prelude> [x*2 | x <- [1,2,3] ]
+[2,4,6]
+</pre>
+
+condition(predicate)
+<pre>
+Prelude> [x*2 | x <- [1..10], x*2 >= 12 ]
+[12,14,16,18,20]
+
+Prelude> boomBangs xs = [ if x < 10 then "Boom!" else "BANG" | x <- xs, odd x ]
+Prelude> boomBangs [7..13]
+["Boom!","Boom!","BANG","BANG"]
+
+Prelude> let adjectives = ["good" ,"bad"]
+Prelude> let nouns = ["news", "idea", "weather"]
+Prelude> [adjective ++ " " ++ "nouns" | adjective <- adjectives, noun <- nouns]
+["good nouns","good nouns","good nouns","bad nouns","bad nouns","bad nouns"]
+Prelude> 
+
+Prelude> length' xs = sum [1 | _ <- xs]
+Prelude> length' [1,3,8]
+3
+
+Prelude> let xxs = [[1,2],[4,8,4],[6,5,4]]
+Prelude> [ [x | x <- xs, even x] | xs <- xxs ]
+[[2],[4,8,4],[6,4]]
+</pre>
+
+
+Tuples
+
+fst
+<pre>
+Prelude> fst (2, "two")
+2
+</pre>
+
+snd
+<pre>
+Prelude> snd (2, "two")
+"two"
+</pre>
+
+zip
+<pre>
+Prelude> zip [1,2,3] [5,5,5]
+[(1,5),(2,5),(3,5)]
+Prelude> zip [1..5] ["one", "two"]
+[(1,"one"),(2,"two")]
+</pre>
+
+<pre>
+Prelude> let triangles = [(a,b,c) | c <- [1..10], b <- [1..10], a <- [1..10]]
+Prelude> let rightTriangles = [ (a,b,c) | c <- [1..10], b <- [1..10], a <- [1..10], a^2 + b^2 == c^2, a+b+c==24]
+Prelude> rightTriangles
+[(8,6,10),(6,8,10)]
+</pre>
