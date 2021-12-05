@@ -187,6 +187,31 @@ Scans are used to monitor the progression of a function that can be implemented 
 [[],[3],[2,3],[1,2,3]]
 </pre>
 
+Function application with $
+<pre>
+($) :: (a -> b) -> a -> b
+f $ x = f x 
+</pre>
+
+Whereas normal function application(space) has a really high precedence, the '$' function has the lowest precedence.
+Function application with a space is left-associative (so 'f a b c' is the same as ((f a) b) c), funciton, function application with '$' is right-associative.
+
+<pre>
+--sum (map sqrt [1..130])
+sum $ map sqrt [1..130]
+
+--sqrt (3 + 4 + 5)
+sqrt $ 3 + 4 + 5
+
+--sum (filter (> 10) (map (*2) [2..10]))
+sum $ filter (>10> $ map (*2) [2..10]
+</pre>
+
+But apart from getting rid of parentheses, '$' means that function application can be treated just like another function.
+<pre>
+Prelude> map ($ 3) [(4+), (10*), (^2), sqrt]
+[7.0,30.0,9.0,1.7320508075688772]
+</pre>
 
 Function composition
 We do function composition with the '.' function, which is defined like so:
@@ -195,6 +220,8 @@ We do function composition with the '.' function, which is defined like so:
 f . g = \x -> f (g x)
 </pre>
 'f' must take as its parameter a value that has the same type as 'g's return value. So the resulting function takes a parameter of the same type that 'g' takes and returns a value of the same type that 'f' returns.
+'negate . (* 3)' returns a function that takes a number, multiplies it by 3 and then negates it.
+
 One of the uses for function composition is making functions on the fly to pass to other functions. Sure, can use lambdas for that, but many times, function composition is clearer and more concise.
 <pre>
 *Main> map (\x -> negate (abs x)) [-6,4,1,3]
@@ -203,6 +230,7 @@ One of the uses for function composition is making functions on the fly to pass 
 [-6,-4,-1,-3]
 </pre>
 
+Function composition is right-associative, so we can compose many function at a time. The expression 'f (g (z x))' is equivalent to '(f . g . z) x'
 <pre>
 *Main> map (\xs -> negate (sum (tail xs))) [[1..5],[3..6],[1..7]]
 [-14,-15,-27]

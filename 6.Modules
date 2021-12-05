@@ -1,0 +1,730 @@
+Loading modules
+
+import
+<pre>
+import Data.List
+numUniques :: (Eq a) => [a] -> Int
+numUqinues = length . nub
+</pre>
+'nub' is a function defined in 'Data.List' that takes a list and weeds out duplicate elements.
+
+In GHCI
+<pre>
+Prelude> :m + Data.List
+Prelude Data.List> 
+-- several modules
+Prelude> :m + Data.List Data.Map Data.Set
+Prelude Data.List Data.Map Data.Set> 
+</pre>
+
+If you just need a couple of functions from a module, you can selectively import just those functions.
+<pre>
+import Data.List (nub, sort)
+</pre>
+
+You can also choose to import all of the functions of a module except a few select ones.
+<pre>
+import Data.List hiding (nub)
+</pre>
+
+When we import 'Data.Map' and then call 'filter', Haskell won't know which function to use. Here's how we solve this:
+<pre>
+import qualified Data.Map
+</pre>
+
+We can rename the qualified import to something shorter:
+<pre>
+import qualified Data.Map as M
+</pre>
+
+Data.List
+'Prelude' module exports some functions from 'Data.List' for convenience.
+
+intersperse
+<pre>
+Prelude Data.List> intersperse '.' "QWER"
+"Q.W.E.R"
+</pre>
+
+intercalate
+<pre>
+Prelude Data.List> intercalate " " ["qwer", "asdf", "zxcv"]
+"qwer asdf zxcv"
+</pre>
+
+transpose
+<pre>
+Prelude Data.List> transpose [[1,2,3],[4,5,6],[7,8,9]]
+[[1,4,7],[2,5,8],[3,6,9]]
+</pre>
+
+concat
+<pre>
+Prelude Data.List> concat ["qw","asdf","zxc"]
+"qwasdfzxc"
+</pre>
+
+concatMap
+is the same as first mapping a function to a list and then concatenating the list with 'concat'
+<pre>
+Prelude Data.List> concatMap (replicate 2) [1..3]
+[1,1,2,2,3,3]
+</pre>
+
+and
+takes a list of boolean values and teturns 'True' only if the values in the list are 'True'.
+<pre>
+Prelude Data.List> and $ map (>4) [5,6,7,8]
+True
+</pre>
+
+or
+<pre>
+Prelude Data.List> or $ map (==4) [1,2,3,4]
+True
+</pre>
+
+iterate
+<pre>
+Prelude Data.List> take 10 $ iterate (*2) 1
+[1,2,4,8,16,32,64,128,256,512]
+</pre>
+
+splitAt
+<pre>
+Prelude Data.List> splitAt 4 "qwerasdfzxcv"
+("qwer","asdfzxcv")
+Prelude Data.List> splitAt 50 "qwerasdfzxcv"
+("qwerasdfzxcv","")
+Prelude Data.List> splitAt (-3) "qwerasdfzxcv"
+("","qwerasdfzxcv")
+Prelude Data.List> let (a,b) = splitAt 3 "foobar" in b ++ a
+"barfoo"
+</pre>
+
+takeWhile
+<pre>
+Prelude Data.List> takeWhile (>3) [10,9,8,7,6,5,4,3,2,1]
+[10,9,8,7,6,5,4]
+</pre>
+
+dropWhile
+<pre>
+Prelude Data.List> dropWhile (/=' ') "This is a sentence"
+" is a sentence"
+</pre>
+
+span
+The first list contains everything the resulting list from 'takewhile' would contain.
+The second list contains the part of the list that would have been dropped.
+<pre>
+Prelude Data.List> let (fw, rest) = span (/= ' ') "This is a sentence" in "First word:" ++ fw ++ ", the rest:" ++ rest
+"First word:This, the rest: is a sentence"
+</pre>
+
+break
+Doing 'break p' is the equivalent of doing 'span (not . p)'
+<pre>
+Prelude Data.List> break (==4) [1,2,3,4,5,6,7]
+([1,2,3],[4,5,6,7])
+Prelude Data.List> span (/=4) [1,2,3,4,5,6,7]
+([1,2,3],[4,5,6,7])
+</pre>
+
+sort
+<pre>
+Prelude Data.List> sort "cbdaefg"
+"abcdefg"
+</pre>
+
+group
+<pre>
+Prelude Data.List> group [1,1,2,2,2,3]
+[[1,1],[2,2,2],[3]]
+Prelude Data.List> group [1,2,2,3,1,1,1,3,4]
+[[1],[2,2],[3],[1,1,1],[3],[4]]
+</pre>
+
+<pre>
+ghci> map (\l@(x:xs) -> (x,length l)) . group . sort $ [1,1,1,1,2,2,2,2,3,3,2,2,2,5,6,7]  
+[(1,4),(2,7),(3,2),(5,1),(6,1),(7,1)] 
+</pre>
+
+inits tails
+are like 'init' and 'tail', only they recursively apply that to a list until there's nothing left.
+<pre>
+Prelude Data.List> inits "qwer"
+["","q","qw","qwe","qwer"]
+Prelude Data.List> tails "qwer"
+["qwer","wer","er","r",""]
+</pre>
+
+searching a list for a sublist.
+<pre>
+import Data.List
+
+search :: (Eq a) => [a] -> [a] -> Bool
+search needle haystack =
+    let nlen = length needle
+    in foldl (\acc x -> if take nlen x == needle then True else acc) False (tails haystack)
+</pre>
+
+isInfixOf
+<pre>
+*Main Data.List> "qwer" `isInfixOf` "qwer asdf zxcv"
+True
+</pre>
+
+isPrefixOf isSuffixOf
+<pre>
+*Main Data.List> "hey" `isPrefixOf` "oh hey there!"
+False
+*Main Data.List> "there!" `isSuffixOf` "oh hey there!"
+True
+</pre>
+
+partition
+takes a list and a predicate and returns a pair of lists. The first list in the result contains all the elements that satisfy the predicate, the second contains all the ones that don't.
+<pre>
+*Main Data.List> partition (`elem` ['A'..'Z']) "QWaEsdfR"
+("QWER","asdf")
+*Main Data.List> partition (>3) [1,2,3,4,5,6]
+([4,5,6],[1,2,3])
+</pre>
+
+It's important to understand how this is different from 'span' and 'break'
+'span' and 'break' are done once they encounter the first element that doesn't and does satisfy the predicate.
+<pre>
+*Main Data.List> span (`elem` ['A'..'Z']) "QWaEsdfR"
+("QW","aEsdfR")
+*Main Data.List> break (`elem` ['A'..'Z']) "QWaEsdfR"
+("","QWaEsdfR")
+</pre>
+
+find
+takes a list and a predicate and returns the first element that satisfies the predicate. But it returns that element wrapped in a 'Maybe' value.
+<pre>
+*Main Data.List> find (>4) [1,2,3,4,5]
+Just 5
+*Main Data.List> find (>5) [1,2,3,4,5]
+Nothing
+</pre>
+
+elementIndex
+<pre>
+*Main Data.List> 1 `elemIndex` [1,2,3,4,5]
+Just 0
+*Main Data.List> 10 `elemIndex` [1,2,3,4,5]
+Nothing
+</pre>
+
+elemIndices
+<pre>
+*Main Data.List> ' ' `elemIndices` "qwer asdf zxcv"
+[4,9]
+</pre>
+
+findIndex findIndices
+<pre>
+*Main Data.List> findIndex (==4) [5,3,2,1,6,4]
+Just 5
+*Main Data.List> findIndices (`elem` ['A'..'Z']) "Qwer Asdf Zxcv"
+[0,5,10]
+</pre>
+
+What if we want to zip together three lists..
+zip3 zip4 zipWith3 zipWith4...
+<pre>
+*Main Data.List> zipWith3 (\x y z -> x + y + z) [1,2,3] [1,2,3,4] [2,2,2]
+[4,6,8]
+*Main Data.List> zip4 [2,3,3] [2,2,2] [5,5,3] [2,2,2]  
+[(2,2,5,2),(3,2,5,2),(3,2,3,2)]
+</pre>
+
+lines
+takes a stirng and return every line of that string in a separate list.
+<pre>
+*Main Data.List> lines "qwer\nasdf\nzxcv"
+["qwer","asdf","zxcv"]
+</pre>
+
+unline
+is the invers function of 'lines'.
+<pre>
+*Main Data.List> unlines ["qwer","asdf","zxcv"]
+"qwer\nasdf\nzxcv\n"
+</pre>
+
+words unwords
+are for splitting a line of text into word or joining a list of words into a text.
+<pre>
+*Main Data.List> words "qwer asdf zxcv"
+["qwer","asdf","zxcv"]
+*Main Data.List> words "qwer          asdf zxcv"
+["qwer","asdf","zxcv"]
+*Main Data.List> unwords ["qwer","asdf","zxcv"]
+"qwer asdf zxcv"
+</pre>
+
+nub
+takes a list and weeds out the duplicate elements, returing a list whose every element is a unique snowflake.
+<pre>
+*Main Data.List> nub [2,1,1,3,3,2,2,2]
+[2,1,3]
+</pre>
+
+delete
+takes an element and a list and deletes the first occurence of that element in the list.
+<pre>
+*Main Data.List> delete '1' "1qwer 1asdf 1zxcv"
+"qwer 1asdf 1zxcv"
+*Main Data.List> delete '1' . delete '1' $ "1qwer 1asdf 1zxcv"
+"qwer asdf 1zxcv"
+*Main Data.List> delete '1' . delete '1' . delete '1' $ "1qwer 1asdf 1zxcv"
+"qwer asdf zxcv"
+</pre>
+
+\\
+is the list difference function. It acts like a set difference, basically.
+<pre>
+*Main Data.List> [1..10] \\ [1,10]
+[2,3,4,5,6,7,8,9]
+*Main Data.List> "qwer" \\ "e"
+"qwr"
+</pre>
+
+union
+<pre>
+*Main Data.List> [1..7] `union` [5..10]
+[1,2,3,4,5,6,7,8,9,10]
+*Main Data.List> "hey man" `union` "man what's up"
+"hey manwt'sup"
+</pre>
+
+intersect
+works like set intersection. It returns only the elements that are found in both lists.
+<pre>
+*Main Data.List> [1..7] `intersect` [5..10]
+[5,6,7]
+</pre>
+
+insert
+takse an elements and a list of elements that can be sorted and inserts it into the last position where it's still less than or equal to the next element.
+<pre>
+*Main Data.List> insert 3 [1,2,4,5]
+[1,2,3,4,5]
+*Main Data.List> insert 3 [2,5,1,4]
+[2,3,5,1,4]
+</pre>
+
+genericLength, genericTake, genericDrop, genericSplitAt, genericIndex, genericReplicate
+Fot instance, 'length' has a type signature of 'length :: [a] -> Int. If we try to get the average of a list of numbers by doing 'let xs = [1..6] in sum xs / length xs', we get a type error, because you can't use '/' with ant 'Int'.
+'genericLength, on the other hand, has a type signature of 'genericLength :: (Num a) => [b] -> a'. Because a Num can act like a floating point number, getting the average by doing. 'let xs = [1..6] in sum xs / genericLength xs' works out just fine.
+
+nubBy, deleteBy, unionBy, intersectBy, groupBy
+take an equality function and then compare them by using that equality function. 'group' is the same as 'groupBy (==)'.
+<pre>
+*Main Data.List> groupBy (\x y -> (x > 0) == (y > 0)) values
+[[-4.3,-2.4,-1.2],[0.4,2.3,5.9,10.5,29.1,5.3],[-2.4,-14.5],[2.9,2.3]]
+</pre>
+
+Data.Function.on
+<pre>
+on :: (b -> b -> c) -> (a -> b) -> a -> a -> c  
+f `on` g = \x y -> f (g x) (g y)  
+</pre>
+
+<pre>
+*Main Data.List Data.Function> groupBy ((==) `on` (> 0)) [-4.3, -2.4, -1.2, 0.4, 2.3, 5.9, 10.5, 29.1, 5.3, -2.4, -14.5, 2.9, 2.3] 
+[[-4.3,-2.4,-1.2],[0.4,2.3,5.9,10.5,29.1,5.3],[-2.4,-14.5],[2.9,2.3]]
+</pre>
+
+sortBy, insertBy, maximumBy, minimumBy
+take a function that determine if one element is greater, smaller or equal to the other. The type signature of 'sortBy' is 'sortBy :: (a -> a -> Ordering) -> [a] -> [a]'
+<pre>
+*Main Data.List Data.Function> let xs = [[5,4,5,4,4],[1,2,3],[3,5,4,3],[],[2],[2,2]]
+*Main Data.List Data.Function> sortBy (compare `on` length) xs
+[[],[2],[2,2],[1,2,3],[3,5,4,3],[5,4,5,4,4]]
+</pre>
+'compare `on` length' is the equivalent of '\x y -> length x `compare` length y'.
+
+
+Data.Char
+
+isControl checks whether a character is a control character.
+isSpace checks whether a character is a white-space characters. That includes spaces, tab characters, newlines, etc.
+isLower checks whether a character is lower-cased.
+isUpper checks whether a character is upper-cased.
+isAlpha checks whether a character is a letter.
+isAlphaNum checks whether a character is a letter or a number.
+isPrint checks whether a character is printable. Control characters, for instance, are not printable.
+isDigit checks whether a character is a digit.
+isOctDigit checks whether a character is an octal digit.
+isHexDigit checks whether a character is a hex digit.
+isLetter checks whether a character is a letter.
+isMark checks for Unicode mark characters. Those are characters that combine with preceding letters to form latters with accents. Use this if you are French.
+isNumber checks whether a character is numeric.
+isPunctuation checks whether a character is punctuation.
+isSymbol checks whether a character is a fancy mathematical or currency symbol.
+isSeparator checks for Unicode spaces and separators.
+isAscii checks whether a character falls into the first 128 characters of the Unicode character set.
+isLatin1 checks whether a character falls into the first 256 characters of Unicode.
+isAsciiUpper checks whether a character is ASCII and upper-case.
+isAsciiLower checks whether a character is ASCII and lower-case.
+
+all
+<pre>
+Prelude Data.List Data.Char> all isAlphaNum "qwer1234"
+True
+Prelude Data.List Data.Char> all isAlphaNum "qwer1234!"
+False
+</pre>
+
+isSpace
+<pre>
+*Main> groupBy ((==) `on` isSpace) "hey guys its me"
+["hey"," ","guys"," ","its"," ","me"]
+</pre>
+
+<pre>
+*Main> filter (not . any isSpace) . groupBy ((==) `on` isSpace) $ "hey guys its me"
+["hey","guys","its","me"]
+</pre>
+
+GeneralCategory type is an enumberation. It presents us with a few possible categories that a character can fall into.
+<pre>
+*Main> generalCategory ' '
+Space
+*Main> generalCategory 'A'
+UppercaseLetter
+*Main> generalCategory 'a'
+LowercaseLetter
+*Main> generalCategory '.'
+OtherPunctuation
+*Main> generalCategory '9'
+DecimalNumber
+*Main> map generalCategory " \t\nA9?|"
+[Space,Control,Control,UppercaseLetter,DecimalNumber,OtherPunctuation,MathSymbol]
+</pre>
+Since the 'GeneralCategory' type is part of the 'Eq' typeclass, we can also test for stuff like 'generalCategory c == Space'.
+
+toUpper converts a character to upper-case. Spaces, numbers, and the like remain unchanged.
+toLower converts a character to lower-case.
+toTitle converts a character to title-case. For most characters, title-case is the same as upper-case.
+digitToInt converts a character to an Int. To succeed, the character must be in the ranges '0'..'9', 'a'..'f' or 'A'..'F'.
+<pre>
+*Main> digitToInt '1' 
+1
+*Main> map digitToInt "FF85AB"
+[15,15,8,5,10,11]
+</pre>
+intToDigit is the inverse function of 'digitToInt'
+<pre>
+*Main> intToDigit 15
+'f'
+</pre>
+
+Ord chr
+convert characters to their corresponding numbers and vice versa.
+The differnece between the ord values of two character is equal to how far apart they are in the Unicode table.
+<pre>
+*Main> ord 'a'
+97
+*Main> chr 97
+'a'
+</pre>
+
+The Caesar cipher is a primitive method of encoding messages by shifting each character in them by a fixed number of positions in the alphabet.
+<pre>
+encode :: Int -> String -> String
+encode shift msg = 
+    let ords = map ord msg
+        shifted = map (+ shift) ords
+    in map chr shifted
+--
+*Main> encode 0 "abcd"
+"abcd"
+*Main> encode 1 "abcd"
+"bcde"
+</pre>
+
+<pre>
+*Main> encode 1 "abcd"
+"bcde"
+*Main> decode 1 "bcde"
+"abcd"
+*Main> decode 5 . encode 5 $ "qwer asdf zxcv"
+"qwer asdf zxcv"
+</pre>
+
+
+Data.Map
+
+<pre>
+import Data.Map hiding (filter)
+
+findKey :: (Eq k) => k -> [(k,v)] -> v  
+findKey key xs = snd . head . filter (\(k,v) -> key == k) $ xs 
+--
+*Main> let myDic = [("a","1"), ("b","2")]
+*Main> findKey "b" myDic
+"2"
+</pre>
+
+What if the key we're looking for isn't in the association list? 
+<pre>
+import Data.Map hiding (foldr)
+
+findKey :: (Eq k) => k -> [(k,v)] -> Maybe v
+findKey key = foldr (\(k,v) acc -> if key == k then Just v else acc) Nothing
+--
+*Main> let myDic = [("a","1"), ("b","2")]
+*Main> findKey "c" myDic
+Nothing
+</pre>
+
+fromList
+takes an association list(in the form of a list) and returns a map with the same associations.
+<pre>
+*Main> Map.fromList [(1,"one"),(2,"two")]
+fromList [(1,"one"),(2,"two")]
+</pre>
+
+empty
+<pre>
+*Main> Map.empty
+fromList []
+</pre>
+
+insert
+<pre>
+*Main> Map.insert 1 "one" Map.empty
+fromList [(1,"one")]
+*Main> Map.insert 2 "two" (Map.insert 1 "one" Map.empty)
+fromList [(1,"one"),(2,"two")]
+*Main> Map.insert 1 "one" . Map.insert 2 "two" $ Map.empty
+fromList [(1,"one"),(2,"two")]
+</pre>
+
+null
+checks if a map is empty
+<pre>
+*Main> Map.null Map.empty
+True
+</pre>
+
+size
+<pre>
+*Main> Map.size $ Map.fromList [(1,"one"),(2,"two")]
+2
+</pre>
+
+singleton
+takes a key and a value and create a map that has exactly one mapping.
+<pre>
+*Main> Map.singleton 3 9
+fromList [(3,9)]
+</pre>
+
+lookup
+<pre>
+*Main> Map.lookup 3 $ Map.singleton 3 9
+Just 9
+</pre>
+
+member
+is a predicate takes a key and a map and report whether the key is in the map or not.
+<pre>
+*Main> Map.member 1 $ Map.fromList [(1,"one"),(2,"two")]
+True
+</pre>
+
+map
+work much like their list equivalents.
+<pre>
+*Main> Map.map (*10) $ Map.fromList [(1,10),(2,20)]
+fromList [(1,100),(2,200)]
+</pre>
+
+toList
+<pre>
+*Main> Map.toList $ Map.singleton 4 3
+[(4,3)]
+</pre>
+
+keys, elems
+<pre>
+*Main> Map.keys $ Map.fromList [(1,"one"),(2,"two")] 
+[1,2]
+*Main> Map.elems $ Map.fromList [(1,"one"),(2,"two")] 
+["one","two"]
+</pre>
+
+fromListWith
+doesn't discard duplicate keys but it uses a function supplied to it to decide what to do with them.
+<pre>
+*Main> Map.fromListWith max [(1,10),(1,100),(2,20)] 
+fromList [(1,100),(2,20)]
+*Main> Map.fromListWith (+) [(1,1),(2,2),(1,3)]
+fromList [(1,4),(2,2)]
+</pre>
+
+insertWith
+<pre>
+*Main> Map.insertWith (+) 1 10 $ Map.fromList [(1,10),(2,20)]
+fromList [(1,20),(2,20)]
+</pre>
+
+
+Data.Set
+
+fromList 
+<pre>
+*Main> let set1 = Set.fromList [1,1,2,3,4,3]
+*Main> set1
+fromList [1,2,3,4]
+</pre>
+
+intersection
+<pre>
+*Main> Set.intersection set1 set2
+fromList [2]
+</pre>
+
+difference
+<pre>
+*Main> Set.difference set1 set2
+fromList [1,3,4]
+</pre>
+
+union
+<pre>
+*Main> Set.union set1 set2
+fromList [1,2,3,4,5,8]
+</pre>
+
+null, size, member, empty, singleton, insert, delete
+<pre>
+...
+</pre>
+
+isSubsetOf
+<pre>
+*Main> Set.fromList [1,2] `Set.isSubsetOf` Set.fromList [1,2,3]
+True
+</pre>
+
+map, filter
+<pre>
+...
+</pre>
+
+nub
+Weeding out duplicates for large lists is much faster if you cram them into a set and then convert them back to a list than using 'nub'. But using 'nub' only requires the type of the list's elements to be part of the 'Eq' typeclass, whereas if you want to cram elements into a set, the type of the list has to be in 'Ord'.
+<pre>
+*Main> nub "abccd"
+"abcd"
+*Main> let setNub xs = Set.toList $ Set.fromList xs
+*Main> setNub "abccd"
+"abcd"
+</pre>
+
+
+Making our own modules
+
+<pre>
+> cat Geometry.hs
+module Geometry  
+( sphereVolume  
+, sphereArea  
+, cubeVolume  
+, cubeArea  
+, cuboidArea  
+, cuboidVolume  
+) where  
+  
+sphereVolume :: Float -> Float  
+sphereVolume radius = (4.0 / 3.0) * pi * (radius ^ 3)  
+  
+sphereArea :: Float -> Float  
+sphereArea radius = 4 * pi * (radius ^ 2)  
+  
+cubeVolume :: Float -> Float  
+cubeVolume side = cuboidVolume side side side  
+  
+cubeArea :: Float -> Float  
+cubeArea side = cuboidArea side side side  
+  
+cuboidVolume :: Float -> Float -> Float -> Float  
+cuboidVolume a b c = rectangleArea a b * c  
+  
+cuboidArea :: Float -> Float -> Float -> Float  
+cuboidArea a b c = rectangleArea a b * 2 + rectangleArea a c * 2 + rectangleArea c b * 2  
+  
+rectangleArea :: Float -> Float -> Float  
+rectangleArea a b = a * b  
+</pre>
+
+To use our module, we just do:
+<pre>
+import Geometry
+</pre>
+
+'Geometry.hs' has to be in the same folder that the program that's importing it is in, though.
+
+Modules can also be given hierarchical struectures. Each module can have a number of sub-modules and they can have sub-modules of their own.
+First, We'll make a folder called 'Geometry'. Mind the Captial 'G'. In it, we'll place three files: 'sphere.hs', 'Cuboid.hs' and 'Cube.hs'.
+<pre>
+> mkdir Geometry
+> ls
+Cube.hs		Cuboid.hs	Sphere.hs
+> cat Sphere.hs 
+module Geometry.Sphere
+( volume
+, area
+) where
+
+volume :: Float -> Float
+voulme radius = (4.0 / 3.0) * pi * (radius ^ 3)
+
+area :: Float -> Float
+area radius = 4 * pi (radius ^ 2)
+> cat Cuboid.hs 
+module Geometry.Cuboid  
+( volume  
+, area  
+) where  
+  
+volume :: Float -> Float -> Float -> Float  
+volume a b c = rectangleArea a b * c  
+  
+area :: Float -> Float -> Float -> Float  
+area a b c = rectangleArea a b * 2 + rectangleArea a c * 2 + rectangleArea c b * 2  
+  
+rectangleArea :: Float -> Float -> Float  
+rectangleArea a b = a * b
+> cat Cube.hs 
+module Geometry.Cube  
+( volume  
+, area  
+) where  
+  
+import qualified Geometry.Cuboid as Cuboid  
+  
+volume :: Float -> Float  
+volume side = Cuboid.volume side side side  
+  
+area :: Float -> Float  
+area side = Cuboid.area side side side
+</pre>
+
+So now if we're in a file that's on the same level as the 'Geometry' folder, we can do, say:
+<pre>
+import Geometry.Sphere
+</pre>
+And then we can call 'area' and 'volume' and they'll give us the area and voulme for a sphere. And if we want to juggle two or more of these modules, we have to do qualified import because they export functions with the same names.
+<pre>
+import qualified Geometry.Sphere as Sphere  
+import qualified Geometry.Cuboid as Cuboid  
+import qualified Geometry.Cube as Cube  
+</pre>
